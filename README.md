@@ -4,6 +4,7 @@
 ![CUDA](https://img.shields.io/badge/CUDA-13.0.1_ARM64-blue?style=flat-square)
 ![Model](https://img.shields.io/badge/Model-Edge0--145B--NVFP4-orange?style=flat-square)
 ![Context](https://img.shields.io/badge/Context-128K_default_%2F_256K_max-informational?style=flat-square)
+![License](https://img.shields.io/badge/License-Apache_2.0-green?style=flat-square)
 
 Standalone Docker build and runtime configuration for running **Edge0-145B-NVFP4** (`edge0-strata` + `edge0-infer`) on an **NVIDIA DGX Spark** (GB10, ARM64, `sm_121`, 128 GiB unified LPDDR5x memory).
 
@@ -166,5 +167,9 @@ export ANTHROPIC_API_KEY="your-secret-key"
 
 ## Credits
 
-- Inference engine & server: [`Edge0-AI/Edge0`](https://github.com/Edge0-AI/Edge0) (`edge0-strata` + `edge0-infer`)
+- Inference engine & server: [`Edge0-AI/Edge0`](https://github.com/Edge0-AI/Edge0) (`edge0-strata` + `edge0-infer`, Apache-2.0)
 - Model weights: [`Edge0/Edge0-145B-NVFP4`](https://huggingface.co/Edge0/Edge0-145B-NVFP4)
+
+## License
+
+This repository's Docker and configuration files are licensed under the [Apache License 2.0](LICENSE), matching [`Edge0-AI/Edge0`](https://github.com/Edge0-AI/Edge0). Model weights are governed by their own upstream license on Hugging Face.
