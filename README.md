@@ -168,6 +168,7 @@ export ANTHROPIC_API_KEY="your-secret-key"
 ## Credits
 
 - Inference engine & server: [`Edge0-AI/Edge0`](https://github.com/Edge0-AI/Edge0) (`edge0-strata` + `edge0-infer`, Apache-2.0)
+- Upstream Strata engine & Monitor UI: [`Niko1221/Strata`](https://github.com/Niko1221/Strata) (MIT)
 - Model weights: [`Edge0/Edge0-145B-NVFP4`](https://huggingface.co/Edge0/Edge0-145B-NVFP4)
 
 ## License
