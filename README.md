@@ -59,6 +59,20 @@ Measured over LAN against `Edge0-145B-NVFP4` (`edge0-strata` `0.1.55`, `--reside
 
 > **Harness note:** Because `concurrency.serving` is `1`, concurrent requests return `rejected_busy`—configure evaluation or coding harnesses for sequential execution (`max_concurrency=1`), or adjust serving slots if your workload requires parallel requests.
 
+### 128K vs. 256K Context Comparison (Real Agentic Trajectories)
+
+![Strata Monitor at 74K/256K context showing 33.9 tok/s decode, 531 tok/s prefill, and 100% VRAM hit rate](docs/monitor-256k.png)
+
+| Metric | `128K` Config (`12K–36K` Active) | `256K` Config (`66K–74K` Active) |
+| --- | --- | --- |
+| **Idle Unified Memory** | `68.8 GiB` / `121.7 GiB` | `71.4 GiB` / `121.7 GiB` (`+2.6 GiB`) |
+| **Active Unified Memory** | `72.9 GiB` (`15K–33K` ctx) | `~74.3 GiB` (`74K` ctx) |
+| **Prefix Cache Reuse** | `8,457` – `33,356` tokens | `64,369` – `69,928` tokens (`97–99%` hit) |
+| **Prefill Throughput** | `962 – 1,050 tok/s` | `527 – 745 tok/s` |
+| **Decode Throughput** | `35.7 – 54.1 tok/s` | `24.8 – 33.9 tok/s` |
+| **VRAM Expert Hit Rate** | `100.0%` (`24,576` experts) | `100.0%` (`24,576` experts) |
+| **Power & GPU Temp** | `~30–38 W` · `60 °C` | `~32 W` · `60 °C` |
+
 ---
 
 ## Quickstart
