@@ -6,7 +6,7 @@ Standalone Docker build and runtime configuration for running **Edge0-145B-NVFP4
 
 - **Self-contained Docker build ([Dockerfile](Dockerfile)):** Multi-stage `nvcr.io/nvidia/cuda:13.0.1-devel-ubuntu24.04` → `13.0.1-runtime-ubuntu24.04` build targeting ARM64 (`-DSTRATA_FORCE_ARM64=ON`) and Blackwell GB10 (`-DCMAKE_CUDA_ARCHITECTURES=121`). Clones [`Edge0-AI/Edge0`](https://github.com/Edge0-AI/Edge0) at build time (pinned to `7b60076641ccd4adeec8b9a41874a24c477fec02`, overridable via `EDGE0_REF`) and unpacks the matching `llama.cpp` revision (`3cf03257f219afbe7334045ff7c6a06ac68c627d`).
 - **Unified Memory Optimization (`--resident-experts` in [strata.json](strata.json)):** By default, `edge0-strata` allocates both a GPU expert cache and a duplicate pinned host-RAM arena, consuming **107.8 GiB** out of **121.7 GiB** usable unified memory on DGX Spark. Enabling `--resident-experts` makes GPU and host expert residency strictly disjoint, dropping memory usage to **68.8–69.2 GiB** (**~39 GiB saved**, leaving **~52.5 GiB** free for OS, KV cache, and other workloads) with no throughput penalty.
-- **128K Context + Speculative Decoding ([strata.json](strata.json)):** Configured with `--max-context 131072`, `--kv int8`, `--ple-io direct`, and MTP speculative decoding (`--spec 4 --spec-min-p 0.5`).
+- **128K Default Context (up to 256K Supported) + Speculative Decoding ([strata.json](strata.json)):** Configured with `--max-context 131072` (128K), `--kv int8`, `--ple-io direct`, and MTP speculative decoding (`--spec 4 --spec-min-p 0.5`). `Edge0-145B-NVFP4` natively supports up to **`262,144` (256K)** context—you can raise `--max-context` in `strata.json` using the `~49–53 GiB` free unified-memory headroom.
 - **Multi-Dialect API + LAN Auth ([docker-compose.yml](docker-compose.yml)):** Exposes OpenAI (`/v1/chat/completions`, `/v1/responses`) and Anthropic (`/v1/messages`) endpoints on port `8000` using `network_mode: host`, `ipc: host`, `memlock: -1`, and `STRATA_API_KEY` authentication (`Authorization: Bearer ...` or `x-api-key: ...`).
 
 ---
@@ -36,7 +36,7 @@ Measured over LAN against `Edge0-145B-NVFP4` (`edge0-strata` `0.1.55`, `--reside
 | **Unified Memory Footprint** | `68.8–69.2 GiB` idle · `72.9 / 122 GB` under `15K–33K` active context (`~49–53 GiB` free) |
 | **Expert Cache Residency** | `24,576` experts cached (`44.3 GB`), **`100.0%` VRAM hit rate**, `0.0 MB/s` disk read |
 | **Model Disk Size** | `~106 GiB` (`Edge0-145B-NVFP4`) |
-| **Context Window** | `131,072` tokens (`--kv int8`) |
+| **Context Window** | `131,072` tokens configured (`--kv int8`) · model native max **`262,144` (256K)** |
 | **Prefill Throughput (12K–36K ctx)** | **`962 – 1,050 tok/s`** (with `8,457` reused prefix tokens) · `~106–140 tok/s` on tiny ~77-tok prompts |
 | **Decode Throughput** | **`35.7 – 54.1 tok/s`** (`54.1 tok/s` peak during answering; `35.7–45.7 tok/s` sustained over 3.8K–5.5K output turns) |
 | **Time to First Token (TTFT)** | `~0.68–0.73 s` (short ~77-token prompt) |
