@@ -24,7 +24,7 @@
     "--mtp",
     "/models/Edge0-145B-NVFP4/mtp",
     "--max-context",
-    "131072",
+    "262144",
     "--kv",
     "int8",
     "--resident-experts"
