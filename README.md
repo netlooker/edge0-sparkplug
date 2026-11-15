@@ -60,7 +60,10 @@ To build against a different upstream commit or branch of `Edge0-AI/Edge0`:
 docker compose build --build-arg EDGE0_REF=main
 ```
 
-### 3. Verify Endpoints
+### 3. Web UI & Endpoint Verification
+
+**Strata Web UI:**  
+Open `http://<dgx-ip>:8000/` in a browser and paste your `STRATA_API_KEY` in the **About** section to authenticate API requests from the UI.
 
 **Health & Status:**
 ```bash
