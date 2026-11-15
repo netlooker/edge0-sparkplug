@@ -1,0 +1,4 @@
+models/
+api.key
+.env
+.DS_Store

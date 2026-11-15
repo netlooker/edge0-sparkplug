@@ -1,0 +1,36 @@
+services:
+  edge0-145b:
+    build: .
+    image: edge0-spark:145b
+    container_name: edge0-145b
+    restart: unless-stopped
+    network_mode: host
+    ipc: host
+    ulimits:
+      memlock: -1
+      stack: 67108864
+    volumes:
+      - ./models:/models
+      - ./strata.json:/opt/edge0/strata.json:ro
+    environment:
+      - STRATA_API_KEY=${STRATA_API_KEY:-change-me}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    entrypoint:
+      - /opt/edge0/edge0-strata/.venv/bin/python
+      - /opt/edge0/edge0-strata/serve/server.py
+    command:
+      - --engine
+      - strata
+      - --config
+      - /opt/edge0/strata.json
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --api-monitor
