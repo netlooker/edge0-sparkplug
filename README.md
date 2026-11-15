@@ -1,6 +1,16 @@
 # edge0-sparkplug
 
+![Target](https://img.shields.io/badge/Target-DGX_Spark_%28GB10_%2F_sm__121%29-76B900?style=flat-square&logo=nvidia)
+![CUDA](https://img.shields.io/badge/CUDA-13.0.1_ARM64-blue?style=flat-square)
+![Model](https://img.shields.io/badge/Model-Edge0--145B--NVFP4-orange?style=flat-square)
+![Context](https://img.shields.io/badge/Context-128K_default_%2F_256K_max-informational?style=flat-square)
+
 Standalone Docker build and runtime configuration for running **Edge0-145B-NVFP4** (`edge0-strata` + `edge0-infer`) on an **NVIDIA DGX Spark** (GB10, ARM64, `sm_121`, 128 GiB unified LPDDR5x memory).
+
+### TL;DR
+- **145B MoE (6.6B active) locally on 128 GiB unified memory** — zero expert swapping (`100%` VRAM hit rate).
+- **Up to `1,050 tok/s` prefill & `36–54 tok/s` decode** at `~38 W` / `60 °C` under sustained `12K–36K` context.
+- **`--resident-experts` saves ~39 GiB RAM** (`107.8` → `68.8 GiB` idle), leaving `~49–53 GiB` free headroom.
 
 ## Why This Setup
 
@@ -122,3 +132,39 @@ curl -s http://127.0.0.1:8000/v1/messages \
     "messages": [{"role": "user", "content": "Hello!"}]
   }' | python3 -m json.tool
 ```
+
+---
+
+## Prerequisites
+
+- **Hardware:** NVIDIA DGX Spark (GB10 / ARM64, 128 GiB unified memory)
+- **Software:** Docker Engine + Docker Compose v2 + NVIDIA Container Toolkit (`nvidia-ctk`)
+- **CLI:** Hugging Face CLI (`hf`) for downloading model weights
+- **Disk Space:** `~125 GB` free (`~106 GiB` for `Edge0-145B-NVFP4` weights + Docker build layers)
+
+---
+
+## Connecting Coding Agents & SDKs
+
+Point any OpenAI- or Anthropic-compatible client, SDK, or coding harness at your DGX Spark:
+
+**OpenAI-compatible clients:**
+```bash
+export OPENAI_BASE_URL="http://<dgx-ip>:8000/v1"
+export OPENAI_API_KEY="your-secret-key"
+# model: edge0_145b
+```
+
+**Anthropic-compatible clients:**
+```bash
+export ANTHROPIC_BASE_URL="http://<dgx-ip>:8000"
+export ANTHROPIC_API_KEY="your-secret-key"
+# model: edge0_145b
+```
+
+---
+
+## Credits
+
+- Inference engine & server: [`Edge0-AI/Edge0`](https://github.com/Edge0-AI/Edge0) (`edge0-strata` + `edge0-infer`)
+- Model weights: [`Edge0/Edge0-145B-NVFP4`](https://huggingface.co/Edge0/Edge0-145B-NVFP4)
