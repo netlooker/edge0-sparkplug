@@ -18,12 +18,13 @@ Measured remotely over LAN against `Edge0-145B-NVFP4` (`edge0-strata` `0.1.55`, 
 | Parameter / Metric | Observed Value |
 | --- | --- |
 | **Unified Memory Footprint** | `68.8–69.2 GiB` used / `121.7 GiB` total (`~52.5 GiB` free) |
+| **Expert Cache Residency** | `24,576` experts cached (`44.3 GB`), **`100.0%` VRAM hit rate**, `0.0 MB/s` disk read |
 | **Model Disk Size** | `~106 GiB` (`Edge0-145B-NVFP4`) |
 | **Context Window** | `131,072` tokens (`--kv int8`) |
+| **Prefill Throughput (12K–36K ctx)** | **`962 – 1,038 tok/s`** (with `8,457` reused prefix tokens) · `~106–140 tok/s` on tiny ~77-tok prompts |
+| **Decode Throughput** | **`35.7 – 45.7 tok/s`** (3.8K–5.1K output turns) · `~34–36 tok/s` on short runs |
 | **Time to First Token (TTFT)** | `~0.68–0.73 s` (short ~77-token prompt) |
-| **Prefill Throughput** | `~106–113 tok/s` (`/v1/chat/completions`), `~140 tok/s` (`/v1/messages`) |
-| **Decode Throughput** | `~34–36 tok/s` (`~84–87%` speculative draft acceptance) |
-| **Power & Thermals** | `~8.7 W` / `33–34 °C` idle · `~29.9 W` / `42 °C` active |
+| **Power & Thermals** | `~8.7 W` / `33–34 °C` idle · `~30–38 W` / `42–60 °C` sustained load (`96%` GPU, `7%` CPU) |
 | **Concurrency** | `1` serving slot (`concurrency.serving: 1`) |
 | **Thinking Mode** | Enabled by default (`thinking: true, thinking_default: true`) |
 | **Structured Output** | `json_object`, `json_schema` (`prompt_and_validate`, `constrained_decoding: false`, `stream_buffered: true`) |
