@@ -35,32 +35,43 @@ Measured remotely over LAN against `Edge0-145B-NVFP4` (`edge0-strata` `0.1.55`, 
 
 ## Quickstart
 
-### 1. Prepare Model Weights
-Download [`Edge0/Edge0-145B-NVFP4`](https://huggingface.co/Edge0/Edge0-145B-NVFP4) (`~106 GiB`) into `./models/Edge0-145B-NVFP4` (mounted to `/models/Edge0-145B-NVFP4` inside the container) using the Hugging Face CLI:
+### 1. SSH into DGX Spark & Clone the Repo
+```bash
+ssh <user>@<dgx-spark-ip>
+git clone https://github.com/netlooker/edge0-sparkplug.git
+cd edge0-sparkplug
+```
+
+### 2. Configure Your API Key
+Create a local `.env` file (ignored by git) with your `STRATA_API_KEY`—otherwise `docker-compose.yml` falls back to the `change-me` placeholder:
+```bash
+echo 'STRATA_API_KEY=your-secret-key' > .env
+```
+
+### 3. Download Model Weights & Build the Image (in Parallel)
+Both the `~106 GiB` model download and the CUDA/C++ image compilation take a while, so you can run them side by side in two SSH sessions (or `tmux` panes).
+
+**Terminal 1 — Download [`Edge0/Edge0-145B-NVFP4`](https://huggingface.co/Edge0/Edge0-145B-NVFP4):**
 ```bash
 hf download Edge0/Edge0-145B-NVFP4 --local-dir ./models/Edge0-145B-NVFP4
 ```
+`strata.json` expects `model-skeleton.gguf`, `ple-fp8.gguf`, `experts.bin`, `labels.bin`, `latent_dense_q8.bin`, `profile.bin`, `mtp/`, and `tokenizer/` inside `./models/Edge0-145B-NVFP4` (mounted to `/models/Edge0-145B-NVFP4`).
 
-`strata.json` expects:
-- `model-skeleton.gguf`
-- `ple-fp8.gguf`
-- `experts.bin`, `labels.bin`, `latent_dense_q8.bin`, `profile.bin`
-- `mtp/` and `tokenizer/`
-
-### 2. Configure API Key & Build / Run on DGX Spark
-Set `STRATA_API_KEY` in a local `.env` file (ignored by git) or your shell before starting—otherwise `docker-compose.yml` falls back to the `change-me` placeholder:
+**Terminal 2 — Build the Docker image:**
 ```bash
-echo 'STRATA_API_KEY=your-secret-key' > .env
-docker compose up -d --build
+cd ~/edge0-sparkplug
+docker compose build
+```
+*(Optional: build against a different upstream commit or branch of `Edge0-AI/Edge0` with `docker compose build --build-arg EDGE0_REF=main`.)*
+
+### 4. Start the Server
+Once both the download and the image build finish:
+```bash
+docker compose up -d
 docker compose logs -f
 ```
 
-To build against a different upstream commit or branch of `Edge0-AI/Edge0`:
-```bash
-docker compose build --build-arg EDGE0_REF=main
-```
-
-### 3. Web UI & Endpoint Verification
+### 5. Web UI & Endpoint Verification
 
 **Strata Web UI:**  
 Open `http://<dgx-ip>:8000/` in a browser and paste your `STRATA_API_KEY` in the **About** section to authenticate API requests from the UI.
