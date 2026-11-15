@@ -11,18 +11,38 @@ Standalone Docker build and runtime configuration for running **Edge0-145B-NVFP4
 
 ---
 
+## Unified Memory Architecture (`--resident-experts`)
+
+```mermaid
+flowchart LR
+    subgraph Default["Default (107.8 / 121.7 GiB used)"]
+        D1["GPU Expert Cache (~47.6 GiB)"]
+        D2["Duplicate Host RAM Arena (~47.6 GiB)"]
+        D3["Skeleton + KV + OS (~12.6 GiB)"]
+    end
+    subgraph Tuned["--resident-experts (68.8–72.9 / 121.7 GiB used)"]
+        T1["GPU Expert Cache (24,576 experts · 44.3 GB · 100% hit)"]
+        T2["Skeleton + KV + OS (~24–28 GiB)"]
+        T3["Free Headroom (~49–53 GiB)"]
+    end
+```
+
+---
+
 ## Observed Performance & Parameters (DGX Spark / NVIDIA GB10)
 
-Measured remotely over LAN against `Edge0-145B-NVFP4` (`edge0-strata` `0.1.55`, `--resident-experts` enabled):
+Measured over LAN against `Edge0-145B-NVFP4` (`edge0-strata` `0.1.55`, `--resident-experts` enabled) under sustained `12K–36K` agentic traffic:
+
+![Strata Monitor showing 54.1 tok/s decode, 1,049 tok/s prefill, and 100% VRAM hit rate](docs/monitor-live.png)
 
 | Parameter / Metric | Observed Value |
 | --- | --- |
-| **Unified Memory Footprint** | `68.8–69.2 GiB` used / `121.7 GiB` total (`~52.5 GiB` free) |
+| **Unified Memory Footprint** | `68.8–69.2 GiB` idle · `72.9 / 122 GB` under `15K–33K` active context (`~49–53 GiB` free) |
 | **Expert Cache Residency** | `24,576` experts cached (`44.3 GB`), **`100.0%` VRAM hit rate**, `0.0 MB/s` disk read |
 | **Model Disk Size** | `~106 GiB` (`Edge0-145B-NVFP4`) |
 | **Context Window** | `131,072` tokens (`--kv int8`) |
-| **Prefill Throughput (12K–36K ctx)** | **`962 – 1,038 tok/s`** (with `8,457` reused prefix tokens) · `~106–140 tok/s` on tiny ~77-tok prompts |
-| **Decode Throughput** | **`35.7 – 45.7 tok/s`** (3.8K–5.1K output turns) · `~34–36 tok/s` on short runs |
+| **Prefill Throughput (12K–36K ctx)** | **`962 – 1,050 tok/s`** (with `8,457` reused prefix tokens) · `~106–140 tok/s` on tiny ~77-tok prompts |
+| **Decode Throughput** | **`35.7 – 54.1 tok/s`** (`54.1 tok/s` peak during answering; `35.7–45.7 tok/s` sustained over 3.8K–5.5K output turns) |
 | **Time to First Token (TTFT)** | `~0.68–0.73 s` (short ~77-token prompt) |
 | **Power & Thermals** | `~8.7 W` / `33–34 °C` idle · `~30–38 W` / `42–60 °C` sustained load (`96%` GPU, `7%` CPU) |
 | **Concurrency** | `1` serving slot (`concurrency.serving: 1`) |
