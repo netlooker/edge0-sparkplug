@@ -36,7 +36,12 @@ Measured remotely over LAN against `Edge0-145B-NVFP4` (`edge0-strata` `0.1.55`, 
 ## Quickstart
 
 ### 1. Prepare Model Weights
-Place the `Edge0-145B-NVFP4` directory under `./models/Edge0-145B-NVFP4` (mounted to `/models/Edge0-145B-NVFP4` inside the container). `strata.json` expects:
+Download [`Edge0/Edge0-145B-NVFP4`](https://huggingface.co/Edge0/Edge0-145B-NVFP4) (`~106 GiB`) into `./models/Edge0-145B-NVFP4` (mounted to `/models/Edge0-145B-NVFP4` inside the container) using the Hugging Face CLI:
+```bash
+hf download Edge0/Edge0-145B-NVFP4 --local-dir ./models/Edge0-145B-NVFP4
+```
+
+`strata.json` expects:
 - `model-skeleton.gguf`
 - `ple-fp8.gguf`
 - `experts.bin`, `labels.bin`, `latent_dense_q8.bin`, `profile.bin`
