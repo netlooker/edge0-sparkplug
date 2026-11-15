@@ -11,21 +11,17 @@ Standalone Docker build and runtime configuration for running **Edge0-145B-NVFP4
 
 ---
 
-## Unified Memory Architecture (`--resident-experts`)
+## Unified Memory Savings (`--resident-experts`)
 
 ```mermaid
-flowchart LR
-    subgraph Default["Default (107.8 / 121.7 GiB used)"]
-        D1["GPU Expert Cache (~47.6 GiB)"]
-        D2["Duplicate Host RAM Arena (~47.6 GiB)"]
-        D3["Skeleton + KV + OS (~12.6 GiB)"]
-    end
-    subgraph Tuned["--resident-experts (68.8–72.9 / 121.7 GiB used)"]
-        T1["GPU Expert Cache (24,576 experts · 44.3 GB · 100% hit)"]
-        T2["Skeleton + KV + OS (~24–28 GiB)"]
-        T3["Free Headroom (~49–53 GiB)"]
-    end
+xychart-beta
+    title "DGX Spark Unified Memory Used (GiB out of 121.7 GiB)"
+    x-axis ["Default (Idle)", "--resident-experts (Idle)", "--resident-experts (15K-33K Ctx)"]
+    y-axis "GiB Used" 0 --> 125
+    bar [107.8, 68.8, 72.9]
 ```
+
+> Disabling the duplicate host-RAM expert arena frees **~39 GiB** at idle (`107.8` → `68.8 GiB`), leaving **~49–53 GiB** of headroom even under `15K–33K` active context.
 
 ---
 
